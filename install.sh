@@ -175,3 +175,22 @@ cat > "${IBUS_ROOT}/component/libpinyin.xml" <<EOF
 </component>
 EOF
 
+cat > "${HOME}/.config/environment.d/ibus-libpinyin.conf" <<EOF
+IBUS_COMPONENT_PATH=${IBUS_ROOT}/component:/usr/share/ibus/component
+EOF
+
+cat > "${HOME}/.config/systemd/user/org.freedesktop.IBus.session.GNOME.service.d/override.conf" <<EOF
+[Service]
+Environment="IBUS_COMPONENT_PATH=${IBUS_ROOT}/component:/usr/share/ibus/component"
+Environment="LD_LIBRARY_PATH=${IBUS_ROOT}/lib"
+Environment="GSETTINGS_SCHEMA_DIR=${HOME}/.local/share/glib-2.0/schemas"
+EOF
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cp -a "${SCRIPT_DIR}/activate.py" "${IBUS_ROOT}/activate.py"
+chmod +x "${IBUS_ROOT}/activate.py"
+
+echo "[6/6] Activating Chinese Pinyin input method..."
+/usr/bin/python3 "${IBUS_ROOT}/activate.py"
+
+echo "Done! Press Super + Space to switch between Chinese Pinyin and English."
